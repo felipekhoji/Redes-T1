@@ -7,6 +7,27 @@ import math
 
 ### funcoes auxiliares ###
 
+#calcula o checksum de um pacote de ate 256 bits, somando de 16 em 16 bits
+#lembrando que o checksum eh feito apenas no cabecalho do pacote, desconsiderando o proprio campo checksum (o parametro deve ser um binario com 144 bits)
+def calculaChecksum(pacote):
+	pacote.zfill(256)
+        nOctetos = len(pacote) / 16
+
+        checksum = 0
+        for i in range(0, nOctetos):
+                checksum = checksum + int(pacote[i*16:i*16+16],2)
+                carry = checksum - checksum % 65536
+                while(carry != 0): #soma o carry
+                        checksum = checksum % 65536
+                        checksum = checksum + 1
+                        carry = checksum - checksum % 65536
+        #inverte bits
+        checksum = checksum ^ 0xFFFF
+
+        return bin(checksum)[2:].zfill(16)
+###
+
+#obtem os dados (maquina, comando, parametros) do formulario da pagina html
 def obtemDadosDoFormulario( form ):
 	possiveisCampos = ['maq1_ps', 'maq1_df', 'maq1_finger', 'maq1_uptime', 'maq2_ps', 'maq2_df', 'maq2_finger', 'maq2_uptime', 'maq3_ps', 'maq3_df', 'maq3_finger', 'maq3_uptime']
 	
