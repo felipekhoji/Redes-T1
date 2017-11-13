@@ -1,3 +1,32 @@
+import math
+#calcula o checksum de um pacote de ate 256 bits, somando de 16 em 16 bits
+#lembrando que o checksum eh feito apenas no cabecalho do pacote, desconsiderando o proprio campo checksum (o parametro deve ser um binario com 144 bits)
+def calculaChecksum(pacote):
+	pacote = pacote.zfill(256)
+        nOctetos = len(pacote) / 16
+
+        checksum = 0
+        for i in range(0, nOctetos):
+                checksum = checksum + int(pacote[i*16:i*16+16],2)
+                carry = checksum - checksum % 65536
+                while(carry != 0): #soma o carry
+                        checksum = checksum % 65536
+                        checksum = checksum + 1
+                        carry = checksum - checksum % 65536
+        #inverte bits
+        checksum = checksum ^ 0xFFFF
+
+        return bin(checksum)[2:].zfill(16)
+###
+#verifica o checksum
+def verificaChecksum(pacote):
+	#campo header_checksum
+	pacote = pacote.zfill(256)
+	pacote = pacote[:96+80] + pacote[96+96:]
+	if calculaChecksum(pacote) == checksum:
+		return True
+	else: 
+		return False
 #converte inteiro para string de binario
 #num: numero a converter
 #tamanho: tamanho da string de bits
