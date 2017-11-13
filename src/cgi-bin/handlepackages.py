@@ -42,9 +42,9 @@ def str_to_binary_str(string):
 #retorna o pacote
 def empacota(tupla,source_address_param, dest_address_param):
 	version = int_to_binary_str(2,4)
-	ihl		= ''	#4 bits
+	ihl		= '0000'	#4 bits
 	type_of_service = int_to_binary_str(0,8)
-	total_length = ''	#16 bits
+	total_length = '0000000000000000'	#16 bits
 	identification = int_to_binary_str(0,16)
 	flags	= int_to_binary_str(0,3) 
 	frag_offset = int_to_binary_str(0,13)
@@ -88,21 +88,21 @@ def empacota(tupla,source_address_param, dest_address_param):
 
 #Desempacota o pacote (string de binarios) e converte para inteiros na base decimal
 def desempacota(pacote):
-	version = int(pacote[0:3], 2)
-	ihl = int(pacote[4:7], 2)
-	type_of_service = int(pacote[8:15], 2)
-	total_length = int(pacote[16:31], 2)
-	identification = int(pacote[32:47], 2)
-	flags = int(pacote[48:50], 2)
-	frag_offset = int(pacote[51:63], 2)
-	time_to_live = int(pacote[64:71], 2)
-	protocol = pacote[72:79] #verificar
-	header_checksum = int(pacote[80:95], 2)
-	source_address = int(pacote[96:127],2)
-	dest_address = int(pacote[128:159], 2)
-	#option = pacote[]
-	#padding = pacote[]
+	version = int(pacote[0:4], 2)
+	ihl = int(pacote[4:8], 2)
+	type_of_service = int(pacote[8:16], 2)
+	total_length = int(pacote[16:32], 2)
+	identification = int(pacote[32:48], 2)
+	flags = int(pacote[48:51], 2)
+	frag_offset = int(pacote[51:64], 2)
+	time_to_live = int(pacote[64:72], 2)
+	protocol = pacote[72:80] #verificar
+	header_checksum = int(pacote[80:96], 2)
+	source_address = int(pacote[96:128],2)
+	dest_address = int(pacote[128:160], 2)
+	option = pacote[160:total_length]
+	#padding = pacote[] - irrelevante
 
 	return (version, ihl, type_of_service, total_length, identification, \
 			flags, frag_offset, time_to_live, protocol, header_checksum, \
-			source_address, dest_address) #falta option e padding
+			source_address, dest_address, option) 
