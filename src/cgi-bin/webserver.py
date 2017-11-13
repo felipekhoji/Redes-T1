@@ -88,9 +88,32 @@ def empacota(tupla,source_address_param, dest_address_param):
 	ihl = int_to_binary_str(ihl_value, 4)
 	padding = str_to_binary_str(''.ljust((ihl_value*32 - tamanho_total)/8))
 
-	return (version+ihl+type_of_service+total_length+identification+flags\
+	empacotado = (version+ihl+type_of_service+total_length+identification+flags\
 			+frag_offset+time_to_live+protocol+header_checksum+source_address\
 			+dest_address+option+padding)
+
+	return empacotado
+
+def desempacota(pacote):
+	version = pacote[0:4]
+	ihl = pacote[4:8]
+	type_of_service = pacote[8:16]
+	total_length = pacote[16:32]
+	identification = pacote[32:48]
+	flags = pacote[48:51]
+	frag_offset = pacote[51:64]
+	time_to_live = pacote[64:72]
+	protocol = pacote[72:80] #verificar
+	header_checksum = pacote[80:96]
+	source_address = pacote[96:128]
+	dest_address = pacote[128:160]
+	#option = pacote[]
+	#padding = pacote[]
+
+	return (version, ihl, type_of_service, total_lenght, identification, \
+			flags, frag_offset, time_to_live, protocol, header_checksum, \
+			source_address, dest_address) #falta option e padding
+
 
 ### main ###
 
