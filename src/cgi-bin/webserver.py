@@ -141,8 +141,6 @@ form = cgi.FieldStorage()
 
 lista = obtemDadosDoFormulario(form)
 
-#print lista
-
 TCP_IP = '127.0.0.1'
 TCP_PORT = {1:8001, 2:8002, 3:8003}
 BUFFER_SIZE = 1024
