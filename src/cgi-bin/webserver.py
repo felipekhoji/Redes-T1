@@ -10,7 +10,7 @@ import math
 #calcula o checksum de um pacote de ate 256 bits, somando de 16 em 16 bits
 #lembrando que o checksum eh feito apenas no cabecalho do pacote, desconsiderando o proprio campo checksum (o parametro deve ser um binario com 144 bits)
 def calculaChecksum(pacote):
-	pacote.zfill(256)
+	pacote = pacote.zfill(256)
         nOctetos = len(pacote) / 16
 
         checksum = 0
@@ -29,7 +29,8 @@ def calculaChecksum(pacote):
 #verifica o checksum
 def verificaChecksum(pacote):
 	#campo header_checksum
-	checksum = pacote[80:95]
+	pacote = pacote.zfill(256)
+	pacote = pacote[:96+80] + pacote[96+96:]
 	if calculaChecksum(pacote) == checksum:
 		return True
 	else: 
@@ -86,7 +87,7 @@ def empacota(tupla,source_address_param, dest_address_param):
 		dest_address = dest_address + int_to_binary_str(int(x), 8)
 	
 	#header_checksum 
-	hearder_checksum = calculaChecksum(version+ihl+type_of_service+total_length\
+	header_checksum = calculaChecksum(version+ihl+type_of_service+total_length\
 					+identification+flags+frag_offset+time_to_live+protocol\
 					+source_address+dest_address)
 
