@@ -26,6 +26,14 @@ def calculaChecksum(pacote):
 
         return bin(checksum)[2:].zfill(16)
 ###
+#verifica o checksum
+def verificaChecksum(pacote):
+	#campo header_checksum
+	checksum = pacote[80:95]
+	if calculaChecksum(pacote) == checksum:
+		return True
+	else: 
+		return False
 
 #obtem os dados (maquina, comando, parametros) do formulario da pagina html
 def obtemDadosDoFormulario( form ):
@@ -64,7 +72,7 @@ def empacota(tupla,source_address_param, dest_address_param):
 	frag_offset = int_to_binary_str(0,13)
 	time_to_live = int_to_binary_str(0,8)
 	protocol = int_to_binary_str(tupla[1],8)
-	header_checksum = int_to_binary_str(0,16)
+	#header_checksum = int_to_binary_str(0,16)
 	source_address = ''	#32 bits
 	dest_address = '' #32 bits
 	option = str_to_binary_str(tupla[2])
@@ -76,6 +84,12 @@ def empacota(tupla,source_address_param, dest_address_param):
 		source_address = source_address + int_to_binary_str(int(x), 8)
 	for x in dest_address_aux:
 		dest_address = dest_address + int_to_binary_str(int(x), 8)
+	
+	#header_checksum 
+	hearder_checksum = calculaChecksum(version+ihl+type_of_service+total_length\
+					+identification+flags+frag_offset+time_to_live+protocol\
+					+source_address+dest_address)
+
 	#tamanho total do pacote
 	tamanho_total = len(version+ihl+type_of_service+total_length\
 				+identification+flags+frag_offset+time_to_live\
@@ -95,22 +109,22 @@ def empacota(tupla,source_address_param, dest_address_param):
 	return empacotado
 
 def desempacota(pacote):
-	version = pacote[0:4]
-	ihl = pacote[4:8]
-	type_of_service = pacote[8:16]
-	total_length = pacote[16:32]
-	identification = pacote[32:48]
-	flags = pacote[48:51]
-	frag_offset = pacote[51:64]
-	time_to_live = pacote[64:72]
-	protocol = pacote[72:80] #verificar
-	header_checksum = pacote[80:96]
-	source_address = pacote[96:128]
-	dest_address = pacote[128:160]
+	version = pacote[0:3]
+	ihl = pacote[4:7]
+	type_of_service = pacote[8:15]
+	total_length = pacote[16:31]
+	identification = pacote[32:47]
+	flags = pacote[48:50]
+	frag_offset = pacote[51:63]
+	time_to_live = pacote[64:71]
+	protocol = pacote[72:79] #verificar
+	header_checksum = pacote[80:95]
+	source_address = pacote[96:127]
+	dest_address = pacote[128:159]
 	#option = pacote[]
 	#padding = pacote[]
 
-	return (version, ihl, type_of_service, total_lenght, identification, \
+	return (version, ihl, type_of_service, total_length, identification, \
 			flags, frag_offset, time_to_live, protocol, header_checksum, \
 			source_address, dest_address) #falta option e padding
 
