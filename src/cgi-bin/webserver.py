@@ -16,8 +16,8 @@ def obtemDadosDoFormulario( form ):
 	#constroi lista de trincas, onde cada trinca tem o numero da maquina, o numero do comando e os parametros do comando
 	lista = []
 	for campo in possiveisCampos:
-        	if campo in form:
-	                lista.append([int(campo[3]), dicionario_comandos[campo[5:]], form.getvalue(campo.replace('_','-'), '')])
+		if campo in form:
+			lista.append([int(campo[3]), dicionario_comandos[campo[5:]], form.getvalue(campo.replace('_','-'), '')])
 	return lista
 
 
@@ -42,6 +42,14 @@ for item in lista:
 	s.connect((TCP_IP, TCP_PORT[item[0]]))
 	s.send(MESSAGE)
 	handlepackages.desempacota(MESSAGE)
-	data = s.recv(BUFFER_SIZE)
+	output = ""
+
+	for i in range(0,5):
+		data = s.recv(BUFFER_SIZE)
+		if data:
+			protocol, source_address, dest_address, option = handlepackages.desempacota(data)
+			output += (''.join(chr(int(option[i:i+8], 2)) for i in xrange(0, len(option), 8)))
+	print "<pre>"
+	print output
+	print "</pre>"
 	s.close()
-	print "received data:", data

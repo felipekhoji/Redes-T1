@@ -5,6 +5,7 @@ import socket
 import sys
 import thread
 import subprocess
+import math
 
 TCP_IP = '127.0.0.1'
 TCP_PORT = int(sys.argv[1])
@@ -32,10 +33,14 @@ def processaRequisicao(conn):
                 	        	comando.append(args[i])
 
 			p = subprocess.Popen(comando, stdout=subprocess.PIPE, shell=True) # executa comando com possiveis argumentos
-			(output, erros) = p.communicate()
-			tupla = [0,0,output]
-			data = handlepackages.empacota(tupla,dest_address,source_address)
-			conn.send(data)  # envia resposta
+			output = p.communicate()
+
+			for i in range(0, 5):
+				print output[0][i*40:i*40+40]
+				tupla = [0,0,output[0][i*40:i*40+40]]
+
+				data = handlepackages.empacota(tupla,dest_address,source_address)
+				conn.send(data)  # envia resposta
 	conn.close()
 
 while True:
