@@ -51,7 +51,7 @@ def empacota(tupla,source_address_param, dest_address_param):
 	frag_offset = int_to_binary_str(0,13)
 	time_to_live = int_to_binary_str(0,8)
 	protocol = int_to_binary_str(tupla[1],8)
-	#header_checksum = int_to_binary_str(0,16)
+	header_checksum = '0000000000000000'
 	source_address = ''	#32 bits
 	dest_address = '' #32 bits
 	option = str_to_binary_str(tupla[2])
@@ -64,11 +64,6 @@ def empacota(tupla,source_address_param, dest_address_param):
 	for x in dest_address_aux:
 		dest_address = dest_address + int_to_binary_str(int(x), 8)
 	
-	#header_checksum 
-	header_checksum = calculaChecksum(version+ihl+type_of_service+total_length\
-					+identification+flags+frag_offset+time_to_live+protocol\
-					+source_address+dest_address)
-
 	#tamanho total do pacote
 	tamanho_total = len(version+ihl+type_of_service+total_length\
 				+identification+flags+frag_offset+time_to_live\
@@ -79,6 +74,12 @@ def empacota(tupla,source_address_param, dest_address_param):
 	
 	total_length = int_to_binary_str(tamanho_total,16)
 	ihl = int_to_binary_str(ihl_value, 4)
+
+	#header_checksum 
+        header_checksum = calculaChecksum(version+ihl+type_of_service+total_length\
+                                        +identification+flags+frag_offset+time_to_live+protocol\
+                                        +source_address+dest_address)
+
 	padding = str_to_binary_str(''.ljust((ihl_value*32 - tamanho_total)/8))
 
 	empacotado = (version+ihl+type_of_service+total_length+identification+flags\

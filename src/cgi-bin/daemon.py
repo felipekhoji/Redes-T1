@@ -20,28 +20,22 @@ s.listen(1)
 def processaRequisicao(conn):
 	data = conn.recv(BUFFER_SIZE)
 	if data:
-		print "received data:", data
+		if(handlepackages.verificaChecksum(data[0:160])):
+			protocol, source_address, dest_address, option = handlepackages.desempacota(data)
 
-		if(handlepackages.verificaChecksum(data[0:160]) == False):
-			print 'ok!'
+			comando = [] # comando e argumentos a serem executados
+			dicionario_comandos = {1:'ps', 2:'df', 3:'finger', 4:'uptime'}
+			comando.append(dicionario_comandos[protocol])
+			args = option.split(" ")
+			if args[0] != '':
+        	        	for i in range(0, len(args)):
+                	        	comando.append(args[i])
 
-		protocol, source_address, dest_address, option = handlepackages.desempacota(data)
-		
-		print protocol, option
-
-		comando = [] # comando e argumentos a serem executados
-		dicionario_comandos = {1:'ps', 2:'df', 3:'finger', 4:'uptime'}
-		comando.append(dicionario_comandos[protocol])
-		args = option.split(" ")
-		if args[0] != '':
-                	for i in (0, len(args)):
-                        	comando.append(args[i])
-
-		p = subprocess.Popen(comando, stdout=subprocess.PIPE, shell=True) # executa comando com possiveis argumentos
-		(output, erros) = p.communicate()
-		tupla = [0,0,output]
-		data = handlepackages.empacota(tupla,dest_address,source_address)
-		conn.send(data)  # envia resposta
+			p = subprocess.Popen(comando, stdout=subprocess.PIPE, shell=True) # executa comando com possiveis argumentos
+			(output, erros) = p.communicate()
+			tupla = [0,0,output]
+			data = handlepackages.empacota(tupla,dest_address,source_address)
+			conn.send(data)  # envia resposta
 	conn.close()
 
 while True:
