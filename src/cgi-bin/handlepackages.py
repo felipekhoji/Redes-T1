@@ -97,13 +97,13 @@ def desempacota(pacote):
 	flags = int(pacote[48:51], 2)
 	frag_offset = int(pacote[51:64], 2)
 	time_to_live = int(pacote[64:72], 2)
-	protocol = pacote[72:80] #verificar
-	header_checksum = int(pacote[80:96], 2)
-	source_address = int(pacote[96:128],2)
-	dest_address = int(pacote[128:160], 2)
+	protocol = int(pacote[72:80],2) 
+	header_checksum = (pacote[80:96], 2)
+	source_address = str(int(pacote[96:104],2)) + "." +str(int(pacote[104:112],2)) + "." +\
+			str(int(pacote[112:120],2)) + "." +str(int(pacote[120:128],2))
+	dest_address = str(int(pacote[128:136],2)) + "." +str(int(pacote[136:144],2)) + "." +\
+			str(int(pacote[144:152],2)) + "." +str(int(pacote[152:160],2))
 	option = pacote[160:total_length]
 	#padding = pacote[] - irrelevante
 
-	return (version, ihl, type_of_service, total_length, identification, \
-			flags, frag_offset, time_to_live, protocol, header_checksum, \
-			source_address, dest_address, option) 
+	return (protocol, source_address, dest_address, option) 
