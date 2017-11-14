@@ -6,6 +6,7 @@ import sys
 import thread
 import subprocess
 import math
+import time
 
 TCP_IP = '127.0.0.1'
 TCP_PORT = int(sys.argv[1])
@@ -19,34 +20,44 @@ s.bind((TCP_IP, TCP_PORT))
 s.listen(1)
 
 def processaRequisicao(conn):
+	# recebe o pacote
 	data = conn.recv(BUFFER_SIZE)
 	if data:
+		# verifica checksum do pacote
 		if(handlepackages.verificaChecksum(data[0:160])):
 			protocol, source_address, dest_address, option = handlepackages.desempacota(data)
 
-			comando = [] # comando e argumentos a serem executados
+			# interpreta comando e argumentos
+			comando = ''
 			dicionario_comandos = {1:'ps', 2:'df', 3:'finger', 4:'uptime'}
-			comando.append(dicionario_comandos[protocol])
-			args = option.split(" ")
+			comando += dicionario_comandos[protocol]
+			args = ''.join(chr(int(option[i:i+8], 2)) for i in xrange(0, len(option), 8)).split(" ")
 			if args[0] != '':
         	        	for i in range(0, len(args)):
-                	        	comando.append(args[i])
+                	        	comando += " " + args[i]
 
-			p = subprocess.Popen(comando, stdout=subprocess.PIPE, shell=True) # executa comando com possiveis argumentos
-			output = p.communicate()
+			# executa comando
+			try:
+				output = subprocess.check_output(comando, stderr=subprocess.STDOUT, shell=True)
+			except subprocess.CalledProcessError as e:
+				output = e.output
 
-			for i in range(0, 5):
-				print output[0][i*40:i*40+40]
-				tupla = [0,0,output[0][i*40:i*40+40]]
+			tamanho_msg = len(output)		
+			msg = output
 
+			# divide o output do comando em pedacos para caber em cada pacote
+			for i in range(0, (tamanho_msg / 32) + 1):
+				tupla = [0,0,msg[i*32:i*32+32]]
 				data = handlepackages.empacota(tupla,dest_address,source_address)
-				conn.send(data)  # envia resposta
+				# envia pacotes da resposta
+				conn.send(data)
+				# tempo para o webserver receber todas as respostas
+				time.sleep(0.005)
 	conn.close()
 
 while True:
 	# o accept espera uma requisicao
 	conn, addr = s.accept()
-	print 'Endereco da conexao:', addr
 	# cria uma thread para processar a requisicao
 	thread.start_new_thread(processaRequisicao, (conn,))
 
