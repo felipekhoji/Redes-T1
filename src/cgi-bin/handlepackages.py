@@ -22,6 +22,7 @@ def calculaChecksum(pacote):
 def verificaChecksum(pacote):
 	#campo header_checksum
 	pacote = pacote.zfill(256)
+	checksum = pacote[96+80:96+96]
 	pacote = pacote[:96+80] + pacote[96+96:]
 	if calculaChecksum(pacote) == checksum:
 		return True
