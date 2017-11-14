@@ -16,10 +16,18 @@ conecte a um conjunto de daemons que estão sendo executados por três máquinas
  e mudar o caminho do diretório para **<.../cgi-bin/>** do projeto
 
 * Depois disso, modificar o arquivo **000-default.conf** usando `sudo vi /etc/apache2/sites-avaiable/000-default.conf`
- alterando o caminho do diretório em **DocumentRoot** para o caminho onde de encontra o html do projeto: **.../src/html**
+ alterando o caminho do diretório em **DocumentRoot** para o caminho onde se encontra o html do projeto: **.../src/html**
 
-* Para finalizar, deve-se **reiniciar** o apache2 por meio de
+* Deve-se, então, **reiniciar** o apache2 por meio de
 `sudo service apache2 restart`
+
+### Fazendo as consultas
+
+* O arquivo *daemon.py* deve ser executado em três portas diferentes, sendo que o número da porta é passado por parâmetro, como a seguir:
+    ```
+    python daemon.py 8001 & python daemon.py 8002 & python daemon.py 8003
+    ```
+* Acessar o endereço http://192.168.56.102 em um navegador de web
 
 ## Contribuidores
 
